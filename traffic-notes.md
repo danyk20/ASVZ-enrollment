@@ -55,7 +55,7 @@ The whole sequence was confirmed with a real login on 2026-11-15 (`asvz-enroll -
 | Call | Result |
 |---|---|
 | `GET /Lessons/{id}` | 200 without login. Lesson details, see below. |
-| `GET /Lessons/{id}/MyEnrollment` | 404 if not enrolled, 200 if enrolled; 401 without token (verified) |
+| `GET /Lessons/{id}/MyEnrollment` | 404 if never enrolled; 200 with `status` 4 ("definitiv") if enrolled; 200 with `status` 6 ("abgemeldet"), `placeNumber` 0 after cancelling; 401 without token |
 | `POST /Lessons/{id}/Enrollment`, body `{}` | **Enrols.** 201, `{"data":{"placeNumber":4,"statusId":4}}` |
 | `DELETE /Lessons/{id}/Enrollment` | Cancels (from the app's JavaScript; not exercised) |
 | `GET /MemberPerson`, `GET /memberships/my` | Profile and membership; the app loads them, enrolment does not send them |

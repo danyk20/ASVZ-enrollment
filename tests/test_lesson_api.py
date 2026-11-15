@@ -71,3 +71,25 @@ def test_my_enrolment_is_none_when_not_enrolled() -> None:
     respx.get(f"{API_URL}/Lessons/781265/MyEnrollment").respond(404)
 
     assert my_enrolment(781265, TOKEN) is None
+
+
+@respx.mock
+def test_my_enrolment_reads_an_active_enrolment() -> None:
+    respx.get(f"{API_URL}/Lessons/781265/MyEnrollment").respond(
+        json={"data": {"status": 4, "statusInfo": "4 - definitiv", "placeNumber": 19}}
+    )
+
+    enrolment = my_enrolment(781265, TOKEN)
+
+    assert enrolment is not None
+    assert enrolment.place_number == 19
+
+
+@respx.mock
+def test_a_cancelled_enrolment_does_not_count_as_enrolled() -> None:
+    # Real answer after cancelling on the lesson page.
+    respx.get(f"{API_URL}/Lessons/781265/MyEnrollment").respond(
+        json={"data": {"status": 6, "statusInfo": "6 - abgemeldet", "placeNumber": 0}}
+    )
+
+    assert my_enrolment(781265, TOKEN) is None

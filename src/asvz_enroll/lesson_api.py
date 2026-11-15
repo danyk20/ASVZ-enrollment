@@ -11,6 +11,9 @@ API_URL = "https://schalter.asvz.ch/tn-api/api"
 LESSON_PAGES_URL = "https://schalter.asvz.ch/tn/lessons"
 TIMEOUT_SECONDS = 30
 
+# Values of "status" in an enrolment record. Seen so far: 4 "definitiv", 6 "abgemeldet".
+ENROLMENT_STATUS_CANCELLED = 6
+
 
 def lesson_page_url(lesson_id: int) -> str:
     """The web page where a person can view the lesson and cancel the enrolment."""
@@ -38,7 +41,11 @@ def get_lesson(lesson_id: int) -> Lesson:
 
 
 def my_enrolment(lesson_id: int, token: AccessToken) -> Enrolment | None:
-    """The enrolment I already have for this lesson, or None."""
+    """The enrolment I currently hold for this lesson, or None.
+
+    ASVZ keeps a cancelled enrolment on record (status "6 - abgemeldet", place 0),
+    so a record alone does not mean I hold a place.
+    """
     response = httpx.get(
         f"{API_URL}/Lessons/{lesson_id}/MyEnrollment",
         headers=_authorisation(token),
@@ -47,7 +54,11 @@ def my_enrolment(lesson_id: int, token: AccessToken) -> Enrolment | None:
     if response.status_code == httpx.codes.NOT_FOUND:
         return None
     response.raise_for_status()
-    return Enrolment(place_number=response.json()["data"]["placeNumber"])
+
+    record = response.json()["data"]
+    if record["status"] == ENROLMENT_STATUS_CANCELLED:
+        return None
+    return Enrolment(place_number=record["placeNumber"])
 
 
 def enrol(lesson_id: int, token: AccessToken) -> Enrolment:
