@@ -28,8 +28,7 @@ Captured 2026-11-15 in the built-in browser, enrolling in lesson 781265
 
 ### Login sequence (worked out 2026-11-15, implemented in `src/asvz_enroll/login.py`)
 
-Steps 1–3b were run for real without credentials. Steps 3c–6 come from the login page's
-JavaScript and the OIDC standard, and are **not yet confirmed with a real login**.
+The whole sequence was confirmed with a real login on 2026-11-15 (`asvz-enroll --check-login`).
 
 1. `GET https://idp.asvz.ch/oauth/v2/authorize?client_id=…&code_challenge=…` →
    302 to `https://id.asvz.ch/login?authRequest=V2_<number>` (a JavaScript page; ASVZ runs Zitadel).
@@ -40,7 +39,8 @@ JavaScript and the OIDC standard, and are **not yet confirmed with a real login*
    a. session check: hidden `shib_idp_ls_*` fields, normally filled by JavaScript; posting
       `…success…=true`, `shib_idp_ls_supported=true`, `_eventId_proceed` works.
    b. username: `j_username`, button `_eventId_submit`.
-   c. password: expected `j_password` (page not seen).
+   c. password: `j_password`, plus `j_username` repeated read-only; button `_eventId_proceed`.
+      A wrong password is expected to show this page again (not confirmed).
    d. redirect via `https://idp.asvz.ch/idps/callback` to
       `https://id.asvz.ch/login/idp/success?id=<intent>&token=<intent token>[&user=<id>]`.
 4. `POST https://api.id.asvz.ch/api/zitadelAuth/login`, JSON

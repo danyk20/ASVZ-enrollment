@@ -29,8 +29,9 @@ USERNAME_PAGE = """
 PASSWORD_PAGE = """
 <title>Switch edu-ID - Login</title>
 <form action="/idp/profile/oidc/authorize?execution=e1s3" method="post">
+  <input type="email" name="j_username" value="me@example.org" readonly>
   <input type="password" name="j_password">
-  <button type="submit" name="_eventId_submit">Login</button>
+  <button type="submit" name="_eventId_proceed">Login</button>
 </form>"""
 
 SECOND_FACTOR_PAGE = "<title>Switch edu-ID - Two-step login</title><p>Enter your code</p>"

@@ -112,7 +112,7 @@ def sign_in_at_edu_id(
     browser: httpx.Client, page: httpx.Response, username: str, password: str
 ) -> EduIdResult:
     """Answer each edu-ID page in turn until edu-ID sends us back to ASVZ."""
-    credentials_already_given: set[str] = set()
+    password_already_given = False
 
     for _ in range(MOST_EDU_ID_PAGES_WE_ANSWER):
         if _is_back_at_asvz(page.url):
@@ -120,10 +120,14 @@ def sign_in_at_edu_id(
 
         form = _form_to_answer(page)
         answers = _answers_for(form, username, password)
-        credentials_asked = answers.keys() & {USERNAME_FIELD, PASSWORD_FIELD}
-        if credentials_asked & credentials_already_given:
-            raise WrongCredentialsError("SWITCH edu-ID did not accept the username or password.")
-        credentials_already_given.update(credentials_asked)
+        # The password page repeats the username field, so only a second request for the
+        # password means the login was refused. (A wrong username is refused there too.)
+        if form.asks_for(PASSWORD_FIELD):
+            if password_already_given:
+                raise WrongCredentialsError(
+                    "SWITCH edu-ID did not accept the username or password."
+                )
+            password_already_given = True
 
         page = browser.post(form.submit_url, data=form.filled_in_with(answers))
         page.raise_for_status()
