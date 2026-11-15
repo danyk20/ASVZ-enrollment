@@ -1,0 +1,16 @@
+# Credentials: never commit these. Only the empty template .env.example is tracked.
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+dist/
+
+# macOS
+.DS_Store
