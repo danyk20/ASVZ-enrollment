@@ -34,6 +34,10 @@ class LessonNotFoundError(AsvzEnrollError):
     """ASVZ has no lesson with this id."""
 
 
+class NoUpcomingLessonError(AsvzEnrollError):
+    """The lesson is over and the lesson expected to follow it is a different one."""
+
+
 class EnrolmentWindowError(AsvzEnrollError):
     """The lesson exists but enrolment is not open right now."""
 

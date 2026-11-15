@@ -26,6 +26,15 @@ class Lesson:
     def enrolment_is_open(self, now: datetime) -> bool:
         return self.enrolment_opens <= now <= self.enrolment_closes
 
+    def is_in_same_weekly_slot_as(self, other: "Lesson") -> bool:
+        """Same sport and title, on the same weekday at the same time of day."""
+        return (
+            self.sport_name == other.sport_name
+            and self.title == other.title
+            and self.starts.weekday() == other.starts.weekday()
+            and self.starts.time() == other.starts.time()
+        )
+
     def describe(self) -> str:
         return f"{self.sport_name}: {self.title}, {self.starts:%a %d %b %Y %H:%M}"
 

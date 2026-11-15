@@ -78,8 +78,10 @@ comes from the app's code (`enrollForLesson`), and the Bearer header was confirm
 
 ## Open points
 
-- Lesson ids change every week (781265 is this one occurrence). Stage 2 must look up next week's id,
-  probably via `www.asvz.ch/asvz_api/event_search` with sport/facility filters — filters not yet examined.
+- Lesson ids of a weekly series are consecutive: next week's lesson is this week's id plus one.
+  Checked 2026-11-15 on Shotokan Karate (781259–781269, Tuesdays) and Body Pump (793840–793850,
+  Mondays). A cancelled week keeps its id (781261, 20 Oct, `status` 3 with `cancellationDate`).
+  Not known: what follows the last lesson of a semester's series.
 - Behaviour of `POST Enrollment` before `enrollmentFrom` (error code/body) was not observed.
 - The waiting-list case (lesson full) was not observed.
 

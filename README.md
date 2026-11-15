@@ -25,7 +25,13 @@ ASVZ_LESSON_ID=781265
 ```
 
 The lesson id is the number at the end of `https://schalter.asvz.ch/tn/lessons/<number>`.
-It is different for every date of a lesson.
+Every date of a weekly lesson has its own id, one higher each week.
+
+You can leave an old id in `.env`: if that lesson is already over, the app moves to the next
+upcoming lesson of the same weekly series. A lesson that started 10 days ago is two weeks
+back, so the app uses the id plus 2. It checks that the lesson found there has the same
+sport, title, weekday and time, and stops with an error if not (for example when the
+semester's series has ended).
 
 ## Use
 
@@ -89,6 +95,7 @@ Read `src/asvz_enroll/cli.py` first; it is the whole story in a few lines.
 | `login.py` | The six steps of the SWITCH edu-ID login |
 | `pkce.py`, `html_forms.py` | Helpers for the login |
 | `lesson_api.py` | The three ASVZ API calls |
+| `upcoming_lesson.py` | From a past lesson id to the next upcoming one |
 | `email_notification.py` | One email through Brevo |
 | `models.py`, `errors.py` | The data and the failures |
 

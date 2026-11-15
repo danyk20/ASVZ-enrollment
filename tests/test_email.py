@@ -86,13 +86,26 @@ def test_email_links_to_the_lesson_page_so_the_enrolment_can_be_changed(
         "BREVO_SENDER_EMAIL=robot@example.org\n"
     )
     monkeypatch.chdir(tmp_path)
-    respx.get("https://schalter.asvz.ch/tn-api/api/Lessons/1").respond(404)
+    respx.get("https://schalter.asvz.ch/tn-api/api/Lessons/1").respond(
+        json={
+            "data": {
+                "id": 1,
+                "sportName": "Karate",
+                "title": "Training",
+                "starts": "2099-01-06T19:00:00+01:00",
+                "enrollmentFrom": "2099-01-03T19:00:00+01:00",
+                "enrollmentUntil": "2099-01-06T19:00:00+01:00",
+                "participantsMax": 20,
+                "participantCount": 0,
+            }
+        }
+    )
     route = respx.post(BREVO_SEND_EMAIL_URL).respond(201, json={})
 
     exit_code = cli.main([])
 
     assert exit_code == 1
     text = json.loads(route.calls.last.request.content)["textContent"]
-    assert text.startswith("Error: ASVZ has no lesson with id 1.")
+    assert text.startswith("Error: Enrolment for Karate: Training, Tue 06 Jan 2099 19:00 opens")
     assert text.endswith("https://schalter.asvz.ch/tn/lessons/1")
     assert "secret" not in text
