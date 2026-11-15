@@ -8,7 +8,13 @@ from asvz_enroll.errors import EnrolmentRefusedError, LessonNotFoundError
 from asvz_enroll.models import AccessToken, Enrolment, Lesson
 
 API_URL = "https://schalter.asvz.ch/tn-api/api"
+LESSON_PAGES_URL = "https://schalter.asvz.ch/tn/lessons"
 TIMEOUT_SECONDS = 30
+
+
+def lesson_page_url(lesson_id: int) -> str:
+    """The web page where a person can view the lesson and cancel the enrolment."""
+    return f"{LESSON_PAGES_URL}/{lesson_id}"
 
 
 def get_lesson(lesson_id: int) -> Lesson:

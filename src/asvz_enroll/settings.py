@@ -11,7 +11,35 @@ USERNAME_KEY = "ASVZ_USERNAME"
 PASSWORD_KEY = "ASVZ_PASSWORD"
 LESSON_ID_KEY = "ASVZ_LESSON_ID"
 
+EMAIL_RECIPIENT_KEY = "ASVZ_EMAIL_RECIPIENT"
+BREVO_API_KEY_KEY = "BREVO_API_KEY"
+BREVO_SENDER_KEY = "BREVO_SENDER_EMAIL"
+
 DEFAULT_ENV_FILE = Path(".env")
+
+
+@dataclass(frozen=True)
+class EmailSettings:
+    recipient: str
+    sender: str
+    brevo_api_key: str = field(repr=False)
+
+
+def read_email_settings(env_file: Path = DEFAULT_ENV_FILE) -> EmailSettings | None:
+    """Who gets the result by email, or None if the .env file names no recipient."""
+    from_env_file = dotenv_values(env_file)
+    recipient = from_env_file.get(EMAIL_RECIPIENT_KEY)
+    if not recipient:
+        return None
+
+    api_key = from_env_file.get(BREVO_API_KEY_KEY)
+    sender = from_env_file.get(BREVO_SENDER_KEY)
+    if not api_key or not sender:
+        raise MissingSettingsError(
+            f"{EMAIL_RECIPIENT_KEY} is set, so {BREVO_API_KEY_KEY} and {BREVO_SENDER_KEY} "
+            f"must be set in {env_file} too."
+        )
+    return EmailSettings(recipient=recipient, sender=sender, brevo_api_key=api_key)
 
 
 @dataclass(frozen=True)

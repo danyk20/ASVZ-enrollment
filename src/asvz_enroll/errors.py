@@ -38,5 +38,9 @@ class EnrolmentWindowError(AsvzEnrollError):
     """The lesson exists but enrolment is not open right now."""
 
 
+class EmailNotSentError(AsvzEnrollError):
+    """Brevo did not accept the email about the result."""
+
+
 class EnrolmentRefusedError(AsvzEnrollError):
     """ASVZ answered the enrolment request with an error."""

@@ -53,6 +53,21 @@ Only test the login, without enrolling:
 uv run asvz-enroll --check-login
 ```
 
+## Email about the result
+
+Add these to `.env` to get an email after every enrolment attempt, whether it succeeded or failed:
+
+```
+ASVZ_EMAIL_RECIPIENT=you@example.org
+BREVO_API_KEY=xkeysib-...
+BREVO_SENDER_EMAIL=an-address-verified-in-brevo@example.org
+```
+
+The email is sent through [Brevo](https://www.brevo.com) (the free plan is enough). Create the
+API key under "SMTP & API" → "API keys"; the sender must be a verified sender in your Brevo
+account. Without `ASVZ_EMAIL_RECIPIENT` no email is sent. If the email cannot be sent, the app
+prints a warning and the exit code still describes the enrolment.
+
 ## Exit codes
 
 | Code | Meaning |
@@ -74,6 +89,7 @@ Read `src/asvz_enroll/cli.py` first; it is the whole story in a few lines.
 | `login.py` | The six steps of the SWITCH edu-ID login |
 | `pkce.py`, `html_forms.py` | Helpers for the login |
 | `lesson_api.py` | The three ASVZ API calls |
+| `email_notification.py` | One email through Brevo |
 | `models.py`, `errors.py` | The data and the failures |
 
 The requests were worked out from the browser traffic; see `traffic-notes.md`.
