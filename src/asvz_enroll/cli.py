@@ -4,7 +4,7 @@ import argparse
 import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import httpx
 
@@ -25,6 +25,8 @@ from asvz_enroll.upcoming_lesson import find_upcoming_lesson
 
 EXIT_OK = 0
 EXIT_NETWORK_PROBLEM = 4
+
+EXACT_TIME = "%a %d %b %H:%M:%S"
 
 Failure = AsvzEnrollError | httpx.HTTPError
 FAILURES = (AsvzEnrollError, httpx.HTTPError)
@@ -102,12 +104,23 @@ def _enrol(request: EnrolmentRequest, lesson: Lesson, now: datetime) -> str:
 def _require_open_enrolment(lesson: Lesson, now: datetime) -> None:
     if now < lesson.enrolment_opens:
         raise EnrolmentWindowError(
-            f"Enrolment for {lesson.describe()} opens {lesson.enrolment_opens:%a %d %b %H:%M}."
+            f"Enrolment for {lesson.describe()} opens {lesson.enrolment_opens:{EXACT_TIME}}. "
+            f"This attempt ran {now:{EXACT_TIME}}, "
+            f"{_describe_duration(lesson.enrolment_opens - now)} too early."
         )
     if not lesson.enrolment_is_open(now):
         raise EnrolmentWindowError(
-            f"Enrolment for {lesson.describe()} closed {lesson.enrolment_closes:%a %d %b %H:%M}."
+            f"Enrolment for {lesson.describe()} closed {lesson.enrolment_closes:{EXACT_TIME}}. "
+            f"This attempt ran {now:{EXACT_TIME}}, "
+            f"{_describe_duration(now - lesson.enrolment_closes)} too late."
         )
+
+
+def _describe_duration(duration: timedelta) -> str:
+    """'0.4 seconds' for a near miss, otherwise days and h:mm:ss like '2 days, 1:24:48'."""
+    if duration < timedelta(minutes=1):
+        return f"{duration.total_seconds():.1f} seconds"
+    return str(timedelta(seconds=round(duration.total_seconds())))
 
 
 def _note_if_moved(requested_lesson_id: int, lesson: Lesson) -> str:

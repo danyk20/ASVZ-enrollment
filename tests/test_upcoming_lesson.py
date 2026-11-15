@@ -92,3 +92,24 @@ def test_a_different_lesson_under_the_calculated_id_is_refused() -> None:
 
     with pytest.raises(NoUpcomingLessonError, match="series has probably ended"):
         find_upcoming_lesson(old_lesson, now)
+
+
+def test_window_error_says_when_the_attempt_ran_and_how_far_off_it_was() -> None:
+    from asvz_enroll.cli import _require_open_enrolment
+    from asvz_enroll.errors import EnrolmentWindowError
+
+    lesson = _karate(781265, "2026-11-17T19:00:00+01:00")  # opens Sat 14 Nov 19:00:00
+
+    with pytest.raises(EnrolmentWindowError) as near_miss:
+        _require_open_enrolment(lesson, datetime.fromisoformat("2026-11-14T18:59:59.600+01:00"))
+    assert str(near_miss.value).endswith(
+        "opens Sat 14 Nov 19:00:00. This attempt ran Sat 14 Nov 18:59:59, 0.4 seconds too early."
+    )
+
+    with pytest.raises(EnrolmentWindowError) as days_early:
+        _require_open_enrolment(lesson, datetime.fromisoformat("2026-11-12T17:35:12+01:00"))
+    assert str(days_early.value).endswith("2 days, 1:24:48 too early.")
+
+    with pytest.raises(EnrolmentWindowError) as too_late:
+        _require_open_enrolment(lesson, datetime.fromisoformat("2026-11-17T19:05:00+01:00"))
+    assert str(too_late.value).endswith("0:05:00 too late.")
