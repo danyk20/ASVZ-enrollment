@@ -59,6 +59,24 @@ Only test the login, without enrolling:
 uv run asvz-enroll --check-login
 ```
 
+## When the request is sent
+
+Many computer clocks are a few seconds, sometimes half a minute, off. A request sent at the
+opening second by such a clock can reach ASVZ before enrolment opens and be refused. So the app
+sends the enrolment a random 35 to 55 seconds after the opening time, by your computer's clock.
+That covers clocks up to 35 seconds behind.
+
+You can start the app up to 10 minutes before enrolment opens: it logs in, then waits. Started
+earlier than that, it stops with an error saying how early it was. Started after the opening,
+it waits only for whatever is left of the delay.
+
+To run it every week, start it at the minute enrolment opens, for example with cron
+(enrolment opening Tuesdays at 19:15):
+
+```
+15 19 * * 2 cd /path/to/ASVZ-enrollment && /path/to/uv run asvz-enroll --lesson-id 777112 >> ~/asvz.log 2>&1
+```
+
 ## Email about the result
 
 Add these to `.env` to get an email after every enrolment attempt, whether it succeeded or failed:
@@ -96,6 +114,7 @@ Read `src/asvz_enroll/cli.py` first; it is the whole story in a few lines.
 | `pkce.py`, `html_forms.py` | Helpers for the login |
 | `lesson_api.py` | The three ASVZ API calls |
 | `upcoming_lesson.py` | From a past lesson id to the next upcoming one |
+| `enrolment_timing.py` | The random 35–55 s delay after opening |
 | `email_notification.py` | One email through Brevo |
 | `models.py`, `errors.py` | The data and the failures |
 

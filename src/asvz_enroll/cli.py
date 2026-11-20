@@ -9,6 +9,11 @@ from datetime import datetime, timedelta
 import httpx
 
 from asvz_enroll.email_notification import send_email
+from asvz_enroll.enrolment_timing import (
+    LONGEST_WAIT_FOR_OPENING,
+    safe_sending_time,
+    wait_until,
+)
 from asvz_enroll.errors import AsvzEnrollError, EnrolmentWindowError
 from asvz_enroll.lesson_api import enrol, get_lesson, lesson_page_url, my_enrolment
 from asvz_enroll.login import log_in
@@ -89,7 +94,8 @@ def check_login(options: argparse.Namespace) -> Outcome:
 
 
 def _enrol(request: EnrolmentRequest, lesson: Lesson, now: datetime) -> str:
-    _require_open_enrolment(lesson, now)
+    _require_reachable_enrolment(lesson, now)
+    sending_time = safe_sending_time(lesson.enrolment_opens)
 
     token = log_in(request.username, request.password)
 
@@ -97,18 +103,34 @@ def _enrol(request: EnrolmentRequest, lesson: Lesson, now: datetime) -> str:
     if existing_enrolment:
         return f"Already enrolled: {lesson.describe()}, place {existing_enrolment.place_number}."
 
+    if sending_time > datetime.now().astimezone():
+        print(
+            f"Enrolment opens {lesson.enrolment_opens:%H:%M:%S}; "
+            f"waiting until {sending_time:%H:%M:%S} in case this computer's clock is behind.",
+            flush=True,
+        )
+        wait_until(sending_time)
+
     enrolment = enrol(lesson.id, token)
-    return f"Enrolled: {lesson.describe()}, place {enrolment.place_number}."
+    sent = datetime.now().astimezone()
+    return (
+        f"Enrolled: {lesson.describe()}, place {enrolment.place_number}.\n"
+        f"Request sent {sent:%H:%M:%S} by this computer's clock, "
+        f"{_describe_duration(sent - lesson.enrolment_opens)} after enrolment opened."
+    )
 
 
-def _require_open_enrolment(lesson: Lesson, now: datetime) -> None:
-    if now < lesson.enrolment_opens:
+def _require_reachable_enrolment(lesson: Lesson, now: datetime) -> None:
+    """Enrolment must be open, or open soon enough to wait for it."""
+    if lesson.enrolment_opens - now > LONGEST_WAIT_FOR_OPENING:
         raise EnrolmentWindowError(
             f"Enrolment for {lesson.describe()} opens {lesson.enrolment_opens:{EXACT_TIME}}. "
             f"This attempt ran {now:{EXACT_TIME}}, "
-            f"{_describe_duration(lesson.enrolment_opens - now)} too early."
+            f"{_describe_duration(lesson.enrolment_opens - now)} too early. "
+            f"The app waits for the opening only if it is at most "
+            f"{_describe_duration(LONGEST_WAIT_FOR_OPENING)} away."
         )
-    if not lesson.enrolment_is_open(now):
+    if now > lesson.enrolment_closes:
         raise EnrolmentWindowError(
             f"Enrolment for {lesson.describe()} closed {lesson.enrolment_closes:{EXACT_TIME}}. "
             f"This attempt ran {now:{EXACT_TIME}}, "
