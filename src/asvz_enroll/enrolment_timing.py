@@ -14,8 +14,9 @@ from datetime import datetime, timedelta
 SHORTEST_DELAY_AFTER_OPENING = timedelta(seconds=35)
 LONGEST_DELAY_AFTER_OPENING = timedelta(seconds=55)
 
-# The app waits for the opening only if it is this close; a run started earlier is a mistake.
-LONGEST_WAIT_FOR_OPENING = timedelta(minutes=10)
+# The app waits for the opening only if it is this close; a run started earlier is taken
+# for a mistake. Users can change it in .env (ASVZ_EARLY_START_MINUTES, see settings.py).
+DEFAULT_LONGEST_WAIT_FOR_OPENING = timedelta(minutes=10)
 
 
 def safe_sending_time(enrolment_opens: datetime) -> datetime:

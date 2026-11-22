@@ -10,7 +10,7 @@ import httpx
 
 from asvz_enroll.email_notification import send_email
 from asvz_enroll.enrolment_timing import (
-    LONGEST_WAIT_FOR_OPENING,
+    DEFAULT_LONGEST_WAIT_FOR_OPENING,
     safe_sending_time,
     wait_until,
 )
@@ -19,6 +19,7 @@ from asvz_enroll.lesson_api import enrol, get_lesson, lesson_page_url, my_enrolm
 from asvz_enroll.login import log_in
 from asvz_enroll.models import Lesson
 from asvz_enroll.settings import (
+    EARLY_START_MINUTES_KEY,
     LESSON_ID_KEY,
     PASSWORD_KEY,
     USERNAME_KEY,
@@ -94,7 +95,7 @@ def check_login(options: argparse.Namespace) -> Outcome:
 
 
 def _enrol(request: EnrolmentRequest, lesson: Lesson, now: datetime) -> str:
-    _require_reachable_enrolment(lesson, now)
+    _require_reachable_enrolment(lesson, now, request.longest_wait_for_opening)
     sending_time = safe_sending_time(lesson.enrolment_opens)
 
     token = log_in(request.username, request.password)
@@ -120,15 +121,20 @@ def _enrol(request: EnrolmentRequest, lesson: Lesson, now: datetime) -> str:
     )
 
 
-def _require_reachable_enrolment(lesson: Lesson, now: datetime) -> None:
+def _require_reachable_enrolment(
+    lesson: Lesson,
+    now: datetime,
+    longest_wait_for_opening: timedelta = DEFAULT_LONGEST_WAIT_FOR_OPENING,
+) -> None:
     """Enrolment must be open, or open soon enough to wait for it."""
-    if lesson.enrolment_opens - now > LONGEST_WAIT_FOR_OPENING:
+    if lesson.enrolment_opens - now > longest_wait_for_opening:
         raise EnrolmentWindowError(
             f"Enrolment for {lesson.describe()} opens {lesson.enrolment_opens:{EXACT_TIME}}. "
             f"This attempt ran {now:{EXACT_TIME}}, "
             f"{_describe_duration(lesson.enrolment_opens - now)} too early. "
             f"The app waits for the opening only if it is at most "
-            f"{_describe_duration(LONGEST_WAIT_FOR_OPENING)} away."
+            f"{_describe_duration(longest_wait_for_opening)} away "
+            f"(set {EARLY_START_MINUTES_KEY} in .env to change this)."
         )
     if now > lesson.enrolment_closes:
         raise EnrolmentWindowError(

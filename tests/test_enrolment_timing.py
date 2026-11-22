@@ -115,3 +115,12 @@ def test_enrolment_waits_for_the_safe_sending_time_then_enrols(
     assert 35 <= (waited_until[0] - opens_just_now).total_seconds() <= 55
     assert message.startswith("Enrolled: Shotokan Karate: Training")
     assert "in case this computer's clock is behind" in capsys.readouterr().out
+
+
+def test_a_longer_early_start_limit_accepts_an_earlier_run() -> None:
+    an_hour_early = OPENS - timedelta(hours=1)
+
+    with pytest.raises(EnrolmentWindowError, match="at most 0:10:00 away"):
+        _require_reachable_enrolment(LESSON, an_hour_early)
+
+    _require_reachable_enrolment(LESSON, an_hour_early, timedelta(minutes=90))

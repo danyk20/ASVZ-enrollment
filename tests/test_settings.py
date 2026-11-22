@@ -1,3 +1,4 @@
+from datetime import timedelta
 from pathlib import Path
 
 import pytest
@@ -49,3 +50,25 @@ def test_lesson_id_must_be_a_number(env_file: Path) -> None:
 
 def test_password_is_not_shown_when_the_request_is_printed(env_file: Path) -> None:
     assert "env-secret" not in repr(read_enrolment_request(None, None, None, env_file))
+
+
+def test_early_start_limit_defaults_to_ten_minutes(env_file: Path) -> None:
+    request = read_enrolment_request(None, None, None, env_file)
+
+    assert request.longest_wait_for_opening == timedelta(minutes=10)
+
+
+def test_early_start_limit_can_be_changed_in_env_file(env_file: Path) -> None:
+    env_file.write_text(env_file.read_text() + "ASVZ_EARLY_START_MINUTES=90\n")
+
+    request = read_enrolment_request(None, None, None, env_file)
+
+    assert request.longest_wait_for_opening == timedelta(minutes=90)
+
+
+@pytest.mark.parametrize("bad_value", ["ten", "-5", "2.5"])
+def test_early_start_limit_must_be_whole_minutes(env_file: Path, bad_value: str) -> None:
+    env_file.write_text(env_file.read_text() + f"ASVZ_EARLY_START_MINUTES={bad_value}\n")
+
+    with pytest.raises(MissingSettingsError, match="whole number of minutes"):
+        read_enrolment_request(None, None, None, env_file)

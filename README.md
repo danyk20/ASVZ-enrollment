@@ -67,7 +67,9 @@ sends the enrolment a random 35 to 55 seconds after the opening time, by your co
 That covers clocks up to 35 seconds behind.
 
 You can start the app up to 10 minutes before enrolment opens: it logs in, then waits. Started
-earlier than that, it stops with an error saying how early it was. Started after the opening,
+earlier than that, it stops with an error saying how early it was. To allow an earlier start,
+set the number of minutes in `.env`, for example `ASVZ_EARLY_START_MINUTES=60`. The login stays
+valid for 12 hours, so keep it well below 720. Started after the opening,
 it waits only for whatever is left of the delay.
 
 To run it every week, start it at the minute enrolment opens, for example with cron
