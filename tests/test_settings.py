@@ -72,3 +72,14 @@ def test_early_start_limit_must_be_whole_minutes(env_file: Path, bad_value: str)
 
     with pytest.raises(MissingSettingsError, match="whole number of minutes"):
         read_enrolment_request(None, None, None, env_file)
+
+
+def test_password_with_dollar_brace_is_read_literally(tmp_path: Path) -> None:
+    file = tmp_path / ".env"
+    file.write_text(
+        'ASVZ_USERNAME=env@example.org\nASVZ_PASSWORD="pa${HOME}ss"\nASVZ_LESSON_ID=111\n'
+    )
+
+    request = read_enrolment_request(None, None, None, file)
+
+    assert request.password == "pa${HOME}ss"

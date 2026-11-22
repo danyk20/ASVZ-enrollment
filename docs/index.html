@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>asvz-enroll: never miss an ASVZ class again</title>
+  <meta name="description" content="Your computer enrols you in your weekly ASVZ class the moment enrolment opens. Paste the link of your class, copy one command, done.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="wordmark" href="#top" aria-label="asvz-enroll, back to top">asvz<span class="dot">&middot;</span>enroll</a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="#how">How it works</a>
+      <a href="#trust">Privacy</a>
+      <a href="#faq">FAQ</a>
+      <a class="icon-link" href="https://github.com/danyk20/ASVZ-enrollment" aria-label="GitHub repository">
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.54-3.87-1.54-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.19 1.83 1.19 3.09 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.68.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
+        <span class="visually-hidden">GitHub</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <div class="device-banner" id="device-banner" role="note" hidden>
+    <div class="container device-banner-inner">
+      <svg class="device-banner-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      <p><strong>Open this page on your computer.</strong> The setup runs on macOS, Windows or Linux, not on a phone or tablet, and that computer has to be on when enrolment opens.</p>
+      <button type="button" class="button button-outline device-banner-button" id="copy-page-link">Copy link to this page</button>
+    </div>
+  </div>
+
+  <section class="hero container">
+    <div class="hero-copy">
+      <p class="pill">Open source &middot; Free</p>
+      <h1>Never miss an ASVZ class again.</h1>
+      <p class="lead">Your computer enrols you in your weekly ASVZ class the moment enrolment opens. Paste the link of your class, copy one command, done.</p>
+      <div class="actions">
+        <a class="button button-primary" href="#setup">Set up in 2 minutes</a>
+        <a class="button button-outline" href="https://github.com/danyk20/ASVZ-enrollment">View on GitHub</a>
+      </div>
+      <p class="trust-line"><svg class="icon-inline" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Your login stays on your computer and goes only to the SWITCH edu-ID login. The developer never sees it, and the code is open for anyone to check. <a href="#trust">Privacy &amp; trust</a></span></p>
+    </div>
+    <div class="terminal" aria-label="Example of a successful run">
+      <div class="terminal-bar" aria-hidden="true"><span></span><span></span><span></span></div>
+<pre class="terminal-body"><span class="prompt">$</span> asvz-enroll --lesson-id 777113
+Enrolment opens 19:15:00; waiting until 19:15:47 &hellip;
+Enrolled: Manege: Akrobatik, Wed 02 Dec 19:15, place 3.
+<span class="success">Email sent.</span></pre>
+    </div>
+  </section>
+
+  <section class="section container" id="setup" aria-labelledby="setup-title">
+    <div class="setup-card">
+      <h2 id="setup-title">Set it up</h2>
+      <p class="device-note" id="device-note" hidden>You're on a phone or tablet. You can look around here, but run the command on your computer.</p>
+
+      <!-- Step 1 -->
+      <div class="step" id="step-class">
+        <div class="step-head">
+          <span class="badge" aria-hidden="true">1</span>
+          <h3>Your class</h3>
+        </div>
+        <div class="step-body">
+          <label class="field-label" for="lesson-link">Link to your ASVZ lesson</label>
+          <input class="text-input" id="lesson-link" name="lesson-link" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://schalter.asvz.ch/tn/lessons/777113" aria-describedby="lesson-help lesson-status">
+          <p class="help" id="lesson-help">Open your class in the ASVZ timetable and copy the address from your browser.</p>
+          <p class="inline-link"><a href="https://www.asvz.ch/426-sportfahrplan" target="_blank" rel="noopener">Open the ASVZ timetable &nearr;</a></p>
+
+          <div class="lesson-status" id="lesson-status" role="status" aria-live="polite"></div>
+          <div class="lesson-card" id="lesson-card" hidden></div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step" id="step-computer">
+        <div class="step-head">
+          <span class="badge" aria-hidden="true">2</span>
+          <h3>Your computer</h3>
+        </div>
+        <div class="step-body">
+          <fieldset class="segmented">
+            <legend class="visually-hidden">Your computer</legend>
+            <input type="radio" id="os-macos" name="os" value="macos">
+            <label for="os-macos">macOS</label>
+            <input type="radio" id="os-windows" name="os" value="windows">
+            <label for="os-windows">Windows</label>
+            <input type="radio" id="os-linux" name="os" value="linux">
+            <label for="os-linux">Linux</label>
+          </fieldset>
+          <p class="note" id="detected-note">Detected: macOS</p>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step" id="step-command">
+        <div class="step-head">
+          <span class="badge" aria-hidden="true">3</span>
+          <h3>Run this command</h3>
+        </div>
+        <div class="step-body">
+          <p class="locked-hint" id="command-hint">Paste your lesson link first</p>
+          <div class="command-area" id="command-area" hidden>
+            <p class="instruction" id="instruction"></p>
+            <div class="code-box">
+              <code class="command-text" id="command-text"></code>
+              <button class="button button-copy" id="copy-button" type="button">Copy</button>
+            </div>
+            <details class="what">
+              <summary>What this command does</summary>
+              <ol>
+                <li>Installs uv if missing (the small tool that runs the app).</li>
+                <li>Downloads the app to your home folder.</li>
+                <li>Asks for your SWITCH edu-ID login (or skip and add it later).</li>
+                <li>Optionally sets up email.</li>
+                <li>Tests the login.</li>
+                <li>Schedules the weekly run.</li>
+              </ol>
+              <p><a id="script-link" href="https://github.com/danyk20/ASVZ-enrollment/blob/main/docs/setup.sh" target="_blank" rel="noopener">Read the script &nearr;</a></p>
+            </details>
+          </div>
+        </div>
+      </div>
+
+      <p class="privacy-note">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <span>Your password is never entered on this website. The command asks for it on your own computer and stores it only there. The developer never receives it. <a href="#trust">Privacy &amp; trust</a></span>
+      </p>
+    </div>
+  </section>
+
+  <section class="section container" id="how" aria-labelledby="how-title">
+    <h2 id="how-title">How it works</h2>
+    <div class="columns">
+      <article class="column">
+        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <h3>Logs in early</h3>
+        <p>Starts 2 minutes before enrolment opens and signs in with your SWITCH edu-ID.</p>
+      </article>
+      <article class="column">
+        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+        <h3>Enrols on time</h3>
+        <p>Sends your enrolment as soon as it opens, every week, without you lifting a finger.</p>
+      </article>
+      <article class="column">
+        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5L12 13l8.5-6.5"/></svg>
+        <h3>Tells you</h3>
+        <p>Optional email after every attempt, with a link to cancel.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section container" id="trust" aria-labelledby="trust-title">
+    <h2 id="trust-title">Privacy &amp; trust</h2>
+    <p class="section-lead">Your SWITCH edu-ID login is the key to your university account. Here is exactly where it goes, and how you can check it yourself.</p>
+    <div class="columns">
+      <article class="column">
+        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <h3>Your login never leaves your computer</h3>
+        <p>It is saved in one file, <code>.env</code>, in the app's folder on your own computer. The app sends it only to the official SWITCH edu-ID login, exactly like your browser does. The developer has no copy and no way to get one.</p>
+      </article>
+      <article class="column">
+        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/></svg>
+        <h3>No server, no tracking</h3>
+        <p>There is no server behind this tool: this page only reads public class times from ASVZ. No account, no analytics, no cookies. The app talks only to ASVZ and SWITCH edu-ID, plus Brevo with your own key if you turn on the email.</p>
+      </article>
+      <article class="column">
+        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>
+        <h3>Open source: check it yourself</h3>
+        <p>Every line of this website, the setup command and the app is public on GitHub. Anyone can read it, and you can read the setup script before you run it.</p>
+      </article>
+    </div>
+    <div class="actions">
+      <a class="button button-outline" href="https://github.com/danyk20/ASVZ-enrollment">Read the code on GitHub</a>
+      <a class="button button-outline" href="https://github.com/danyk20/ASVZ-enrollment/blob/main/docs/setup.sh">Read the setup script</a>
+    </div>
+  </section>
+
+  <section class="section container" aria-labelledby="before-title">
+    <div class="before-box">
+      <h2 id="before-title">Before you start</h2>
+      <ul>
+        <li>Your computer must be on and awake at the start time.</li>
+        <li>Works with SWITCH edu-ID logins without a code from an app or SMS.</li>
+        <li>If you can't attend, cancel in time: ASVZ blocks you for 8 days after the third no-show.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section container" id="faq" aria-labelledby="faq-title">
+    <h2 id="faq-title">FAQ</h2>
+    <div class="faq">
+      <details>
+        <summary>Is this official?</summary>
+        <p>No. It's an independent open-source tool and isn't affiliated with ASVZ.</p>
+      </details>
+      <details>
+        <summary>Where is my password stored?</summary>
+        <p>Only in a file called <code>.env</code> in the app's folder on your computer. It is sent only to the SWITCH edu-ID login.</p>
+      </details>
+      <details>
+        <summary>Can the developer see my password?</summary>
+        <p>No. It is typed on your computer and stays there; nothing is ever sent to the developer. There is no server that could receive it. Because the code is public, anyone can check that, line by line, on <a href="https://github.com/danyk20/ASVZ-enrollment">GitHub</a>.</p>
+      </details>
+      <details>
+        <summary>How can I be sure the code does what it says?</summary>
+        <p>All of it is open source. Read the <a href="https://github.com/danyk20/ASVZ-enrollment/blob/main/docs/setup.sh">setup script</a> before you run it, or the app's code in <a href="https://github.com/danyk20/ASVZ-enrollment/tree/main/src/asvz_enroll">src/asvz_enroll</a>. The login code is in <code>login.py</code>; you will see it only contacts ASVZ and SWITCH edu-ID.</p>
+      </details>
+      <details>
+        <summary>What if my computer is asleep?</summary>
+        <p>Nothing happens that week. Keep it plugged in and awake at the start time.</p>
+      </details>
+      <details>
+        <summary>How do I stop it?</summary>
+        <p>Follow the steps for your system in <a href="https://github.com/danyk20/ASVZ-enrollment/blob/main/SETUP-GUIDE.md#stop-or-change-the-weekly-enrolment" target="_blank" rel="noopener">&ldquo;Stop or change the weekly enrolment&rdquo; in the setup guide &nearr;</a></p>
+      </details>
+      <details>
+        <summary>The semester is over &mdash; now what?</summary>
+        <p>Paste the link of the new class and run the new command. It replaces nothing else.</p>
+      </details>
+      <details>
+        <summary>Can I add a second class?</summary>
+        <p>Yes. Paste the second link and run its command too.</p>
+      </details>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>asvz<span class="dot">&middot;</span>enroll &middot; <a href="https://github.com/danyk20/ASVZ-enrollment">Open source on GitHub</a> &middot; Not affiliated with ASVZ.</p>
+  </div>
+</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

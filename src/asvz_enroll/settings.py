@@ -30,7 +30,7 @@ class EmailSettings:
 
 def read_email_settings(env_file: Path = DEFAULT_ENV_FILE) -> EmailSettings | None:
     """Who gets the result by email, or None if the .env file names no recipient."""
-    from_env_file = dotenv_values(env_file)
+    from_env_file = dotenv_values(env_file, interpolate=False)
     recipient = from_env_file.get(EMAIL_RECIPIENT_KEY)
     if not recipient:
         return None
@@ -60,7 +60,7 @@ def read_enrolment_request(
     env_file: Path = DEFAULT_ENV_FILE,
 ) -> EnrolmentRequest:
     """Combine the options given on the command line with the values in the .env file."""
-    from_env_file = dotenv_values(env_file)
+    from_env_file = dotenv_values(env_file, interpolate=False)
     chosen = {
         USERNAME_KEY: username or from_env_file.get(USERNAME_KEY),
         PASSWORD_KEY: password or from_env_file.get(PASSWORD_KEY),

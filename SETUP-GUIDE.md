@@ -1,5 +1,7 @@
 # Enrol automatically every week: step-by-step guide
 
+Easiest: use the setup tool at https://danyk20.github.io/ASVZ-enrollment/
+
 This guide sets up your computer so that it enrols you in your ASVZ class every week, on
 its own, the moment enrolment opens. You don't need to know programming: you copy commands,
 paste them and press Enter.

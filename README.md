@@ -1,5 +1,7 @@
 # asvz-enroll
 
+Easiest: use the setup tool at https://danyk20.github.io/ASVZ-enrollment/
+
 Enrols you in an ASVZ lesson from the terminal, right now.
 
 **New here? Follow the [step-by-step setup guide](SETUP-GUIDE.md)** to have your computer
