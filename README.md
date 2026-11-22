@@ -2,6 +2,9 @@
 
 Enrols you in an ASVZ lesson from the terminal, right now.
 
+**New here? Follow the [step-by-step setup guide](SETUP-GUIDE.md)** to have your computer
+enrol you every week by itself, on macOS, Windows or Linux. No programming knowledge needed.
+
 ## Setup
 
 ```bash
@@ -72,12 +75,17 @@ set the number of minutes in `.env`, for example `ASVZ_EARLY_START_MINUTES=60`. 
 valid for 12 hours, so keep it well below 720. Started after the opening,
 it waits only for whatever is left of the delay.
 
-To run it every week, start it at the minute enrolment opens, for example with cron
-(enrolment opening Tuesdays at 19:15):
+To run it every week, start it a couple of minutes before enrolment opens, for example with
+cron (enrolment opening Tuesdays at 19:15, so start at 19:13):
 
 ```
-15 19 * * 2 cd /path/to/ASVZ-enrollment && /path/to/uv run asvz-enroll --lesson-id 777112 >> ~/asvz.log 2>&1
+13 19 * * 2 sh "$HOME/ASVZ-enrollment/scripts/enrol-weekly.sh" --lesson-id 777112
 ```
+
+`scripts/enrol-weekly.sh` (macOS, Linux) and `scripts/enrol-weekly.bat` (Windows Task
+Scheduler) find uv, run the app with the options you give them, and append everything to
+`asvz.log` in your home folder. The [setup guide](SETUP-GUIDE.md) walks through it on each
+system.
 
 ## Email about the result
 
