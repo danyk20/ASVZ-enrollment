@@ -10,17 +10,25 @@ import {
   schedule,
 } from "./lesson.js";
 import {
+  FUNNEL,
   PHONE_VISIT_EVENT,
   classLabel,
   commandCopiedEvent,
   countEvent,
+  countOnce,
   lessonLookedUpEvent,
+  linkClickEvent,
+  lookupFailedEvent,
   startAnalytics,
   systemChosenEvent,
+  visitTimeEvents,
 } from "./analytics.js";
 
 const CHECK_DELAY_MS = 400;
 const COPIED_MS = 2000;
+// A failed lookup is counted only if the link stays wrong this long, so half-typed links
+// don't count as failures.
+const FAILURE_COUNT_DELAY_MS = 3000;
 const REPO_URL = "https://github.com/danyk20/ASVZ-enrollment";
 const PLATFORM_NAMES = { macos: "macOS", windows: "Windows", linux: "Linux" };
 const SCRIPT_URLS = {
@@ -54,6 +62,7 @@ const countedSystems = new Set(); // "lessonId:platform" pairs already counted
 let lookupId = 0;
 let checkTimer = null;
 let copyTimer = null;
+let failureTimer = null;
 
 function setStatus(text, kind = "") {
   statusBox.className = `lesson-status ${kind}`.trim();
@@ -69,7 +78,13 @@ function showLoading() {
   statusBox.replaceChildren(spinner, document.createTextNode("Looking up your class…"));
 }
 
+function countFailureIfItStays(code) {
+  clearTimeout(failureTimer);
+  failureTimer = setTimeout(() => countOnce(lookupFailedEvent(code)), FAILURE_COUNT_DELAY_MS);
+}
+
 function showError(code) {
+  countFailureIfItStays(code);
   linkInput.setAttribute("aria-invalid", "true");
   setStatus(ERROR_MESSAGES[code] ?? ERROR_MESSAGES.network, "is-error");
   lessonCard.hidden = true;
@@ -162,10 +177,12 @@ function resetLesson() {
 async function checkLink() {
   const id = ++lookupId;
   const text = linkInput.value;
+  clearTimeout(failureTimer);
   if (text.trim() === "") {
     resetLesson();
     return;
   }
+  countOnce(FUNNEL.linkEntered);
 
   const parsed = parseLessonLink(text);
   if (parsed.error) {
@@ -190,6 +207,7 @@ async function checkLink() {
   current = schedule(lesson);
   currentLabel = classLabel(lesson, current);
   countEvent(lessonLookedUpEvent(currentLabel), lesson.facility);
+  countOnce(FUNNEL.lessonFound);
   renderLesson(lesson, current);
   renderCommand();
 }
@@ -229,6 +247,7 @@ async function copyCommand() {
   if (!copied) return;
 
   countEvent(commandCopiedEvent(platform, currentLabel));
+  countOnce(FUNNEL.commandCopied);
   copyButton.textContent = "Copied ✓";
   clearTimeout(copyTimer);
   copyTimer = setTimeout(() => {
@@ -263,6 +282,11 @@ for (const input of platformInputs) {
 copyButton.addEventListener("click", copyCommand);
 
 startAnalytics();
+countOnce(FUNNEL.visit);
+for (const name of visitTimeEvents(new Date())) countEvent(name);
+for (const link of document.querySelectorAll("[data-track]")) {
+  link.addEventListener("click", () => countEvent(linkClickEvent(link.dataset.track)));
+}
 
 const onPhoneOrTablet = isPhoneOrTablet(navigator);
 if (onPhoneOrTablet) {
