@@ -117,8 +117,6 @@ export function schedule(lesson) {
   };
 }
 
-// Takes the browser's navigator (or any object shaped like it).
-// Returns "macos", "windows" or "linux". Unknown systems count as macOS.
 /**
  * True on phones and tablets. The setup needs a computer (macOS, Windows or Linux): phones
  * can't run the setup command or keep a weekly job running. iPads report themselves as
@@ -131,6 +129,8 @@ export function isPhoneOrTablet(navigatorLike) {
   return /Macintosh/i.test(userAgent) && (navigatorLike?.maxTouchPoints ?? 0) > 1;
 }
 
+// Takes the browser's navigator (or any object shaped like it).
+// Returns "macos", "windows" or "linux". Unknown systems count as macOS.
 export function detectPlatform(navigatorLike) {
   const fromData = navigatorLike?.userAgentData?.platform;
   const text = String(fromData || navigatorLike?.platform || navigatorLike?.userAgent || "")

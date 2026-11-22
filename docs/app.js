@@ -9,6 +9,15 @@ import {
   parseLessonLink,
   schedule,
 } from "./lesson.js";
+import {
+  PHONE_VISIT_EVENT,
+  classLabel,
+  commandCopiedEvent,
+  countEvent,
+  lessonLookedUpEvent,
+  startAnalytics,
+  systemChosenEvent,
+} from "./analytics.js";
 
 const CHECK_DELAY_MS = 400;
 const COPIED_MS = 2000;
@@ -40,6 +49,8 @@ const platformInputs = [...document.querySelectorAll('input[name="os"]')];
 
 let platform = detectPlatform(navigator);
 let current = null; // the schedule for the lesson that was found, or null
+let currentLabel = ""; // that lesson's name for analytics, e.g. "Manege: Akrobatik (Wednesday 19:15)"
+const countedSystems = new Set(); // "lessonId:platform" pairs already counted
 let lookupId = 0;
 let checkTimer = null;
 let copyTimer = null;
@@ -125,9 +136,17 @@ function renderCommand() {
   if (!ready) return;
 
   commandText.textContent = buildCommand(platform, current, DEFAULT_SITE_URL);
+  countSystemOnce();
   instruction.innerHTML = INSTRUCTIONS[platform];
   scriptLink.href = SCRIPT_URLS[platform];
   copyButton.textContent = "Copy";
+}
+
+function countSystemOnce() {
+  const key = `${current.lessonId}:${platform}`;
+  if (countedSystems.has(key)) return;
+  countedSystems.add(key);
+  countEvent(systemChosenEvent(platform), currentLabel);
 }
 
 function resetLesson() {
@@ -169,6 +188,8 @@ async function checkLink() {
     return;
   }
   current = schedule(lesson);
+  currentLabel = classLabel(lesson, current);
+  countEvent(lessonLookedUpEvent(currentLabel), lesson.facility);
   renderLesson(lesson, current);
   renderCommand();
 }
@@ -207,6 +228,7 @@ async function copyCommand() {
   }
   if (!copied) return;
 
+  countEvent(commandCopiedEvent(platform, currentLabel));
   copyButton.textContent = "Copied ✓";
   clearTimeout(copyTimer);
   copyTimer = setTimeout(() => {
@@ -240,8 +262,11 @@ for (const input of platformInputs) {
 
 copyButton.addEventListener("click", copyCommand);
 
+startAnalytics();
+
 const onPhoneOrTablet = isPhoneOrTablet(navigator);
 if (onPhoneOrTablet) {
+  countEvent(PHONE_VISIT_EVENT);
   $("device-banner").hidden = false;
   $("device-note").hidden = false;
   const copyPageLink = $("copy-page-link");
